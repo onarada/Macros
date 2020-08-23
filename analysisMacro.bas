@@ -2,11 +2,11 @@ Sub Macro1()
     'ユニーク配列の取得
     Worksheets("データソース").Activate
     Dim sampleArray, koumokuArray
-    sampleArray = Distinct(Range("B2:B14").Value)
-    koumokuArray = Distinct(Range("C2:C14").Value)
-    For Each sampleID In sampleArray
-        For Each koumokuID In koumokuArray
-            sheetTitle = sampleID & "-" & koumokuID
+    sampleArray = Distinct(Range(Range("B2"), Cells(Rows.Count, 2).End(xlUp)).Value)
+    koumokuArray = Distinct(Range(Range("C2"), Cells(Rows.Count, 3).End(xlUp)).Value)
+    For Each koumokuID In koumokuArray
+        For Each sampleID In sampleArray
+            sheetTitle = koumokuID & "-" & sampleID
             Worksheets("データソース").copy After:=Worksheets(Worksheets.Count)
             ActiveSheet.Name = sheetTitle
             With Range("A1")
@@ -30,18 +30,22 @@ Sub Macro1()
             Range(Range("BA1:CL1"), Cells(Rows.Count, 53).End(xlUp)).copy Sheets(1).Range("AR1")
             '解析データシートを複製
             Sheets(1).copy After:=Sheets(Sheets.Count)
-            '解析データシート名に項目名を挿入
-            'Range("A1").Select
-            'ActiveCell.Offset(1, 0).Select
-            'ActiveSheet.Name = ActiveCell.Value
+            '解析データシート名に項目名とサンプル名を挿入
+            sheetname = koumokuID & "×" & sampleID
+            ActiveSheet.Name = sheetname
+            '解析データシートの図形を削除
+            ActiveSheet.Shapes.SelectAll
+            Selection.Delete
+            'データ貼り付け元シートを削除
+            Sheets(sheetTitle).Select
+            Application.DisplayAlerts = False
+            ActiveSheet.Delete
             'フォーマットのデータをクリア
             Sheets(1).Select
             Range("A2:CC11").Clear
-            Range("C13:E15").Clear
-            '作成した解析データを表示
-            Sheets(Sheets.Count).Select
-        Next koumokuID
-    Next sampleID
+            Range("C13:E22").Clear
+        Next sampleID
+    Next koumokuID
 End Sub
 
 Function Distinct(args As Variant) As Variant
